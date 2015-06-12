@@ -47,17 +47,21 @@ class SlackAlert(AlertPlugin):
         message = Template(slack_template).render(c)
         self._send_slack_alert(message, service, color=color, sender='Cabot')
 
-    def _send_slack_alert(self, message, service, color='green', sender='Cabot'):
+    def _send_slack_alert(self, message, service, color='good', sender='Cabot'):
 
         channel = '#' + env.get('SLACK_ALERT_CHANNEL')
         url = env.get('SLACK_WEBHOOK_URL')
-        icon_url = env.get('SLACK_ICON_URL')
+        icon_url = env.get('SLACK_ICON_URL', False)
+        icon_emoji = env.get('SLACK_ICON_EMOJI', ':bell:')
 
-        # TODO: handle color
-        resp = requests.post(url, data=json.dumps({
+        if icon_url:
+            msg = {'icon_url': icon_url}
+        else:
+            msg = {'icon_emoji': icon_emjoi}
+
+        msg.update({
             'channel': channel,
             'username': sender[:15],
-            'icon_url': icon_url,
             'attachments': [{
                 'title': service.name,
                 'text': message,
@@ -73,7 +77,8 @@ class SlackAlert(AlertPlugin):
                     }
                 ]
             }]
-        }))
+        })
+        resp = requests.post(url, data=json.dumps(msg))
 
 class SlackAlertUserData(AlertPluginUserData):
     name = "Slack Plugin"
