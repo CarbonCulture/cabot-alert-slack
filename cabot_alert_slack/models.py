@@ -57,7 +57,7 @@ class SlackAlert(AlertPlugin):
         if icon_url:
             msg = {'icon_url': icon_url}
         else:
-            msg = {'icon_emoji': icon_emjoi}
+            msg = {'icon_emoji': icon_emoji}
 
         msg.update({
             'channel': channel,
